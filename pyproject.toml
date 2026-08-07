@@ -1,4 +1,7 @@
 [dependency-groups]
 dev = [
     "fastapi[standard]>=0.141.1",
+    "psycopg>=3.3.4",
+    "pydantic-settings>=2.14.2",
+    "sqlmodel>=0.0.39",
 ]
