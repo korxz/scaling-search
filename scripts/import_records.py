@@ -6,8 +6,6 @@ from sqlmodel import Session
 from app.database import engine
 from app.models.movie import Movie
 
-filename = "TMDB_movie_dataset_v11.csv"
-
 BATCH_SIZE = 5_000
 
 # Some overview/keyword cells exceed the 128KB default field limit.
@@ -46,11 +44,11 @@ def map_to_row(row) -> dict:
         keywords= split_list(row[23]),
     )
 
-def import_records() -> int:
+def import_records(csv_path: str) -> int:
     """Insert rows in batches, committing per batch so a failure keeps prior work."""
     total = 0
 
-    with open(f"/Users/roksilic/Downloads/{filename}", newline='') as csvfile, Session(engine) as session:
+    with open(csv_path, newline='') as csvfile, Session(engine) as session:
         reader = csv.reader(csvfile, delimiter=',')
         next(reader)
 
@@ -73,5 +71,8 @@ def flush(session: Session, batch: list[dict]) -> int:
     return len(batch)
 
 if __name__ == "__main__":
-    count = import_records()
+    if len(sys.argv) != 2:
+        sys.exit("usage: python -m scripts.import_records <path-to-csv>")
+
+    count = import_records(sys.argv[1])
     print(f"done: {count:,} rows")
